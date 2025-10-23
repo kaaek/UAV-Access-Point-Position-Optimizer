@@ -1,5 +1,5 @@
 %%
-% author: Khalil El Kaaki
+% author: Khalil El Kaaki & Joe Abi Samra
 % 23/10/2025
 %%
 function br = bitrate(p_r, p_n, BW, a)

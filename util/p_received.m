@@ -1,5 +1,5 @@
 %%
-% author: Khalil El Kaaki
+% author: Khalil El Kaaki & Joe Abi Samra
 % 23/10/2025
 %%
 function p_r = p_received(user_pos, uav_pos, H, K, GAMMA, D_0, P_T)
