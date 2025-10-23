@@ -3,7 +3,7 @@
 % 23/10/2025
 %% 
 
-function baselineSol(M,N,AREA,H,K,GAMMA,D_0,P_T,P_N,MAX_ITER,TOL,BW)
+function uav_pos = baselineSol(M,N,AREA,H,K,GAMMA,D_0,P_T,P_N,MAX_ITER,TOL,BW)
 user_pos        = AREA * rand(2, M);
 uav_pos         = kMeans(user_pos, N, AREA, MAX_ITER, TOL);
 p_r             = p_received(user_pos, uav_pos, H, K, GAMMA, D_0, P_T);
