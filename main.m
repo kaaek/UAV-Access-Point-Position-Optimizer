@@ -22,6 +22,6 @@ TOL         = 1e-3;     % Tolerance for k-means convergence
 BW          = 40;       % MHz
 
 uav_pos = baselineSol(M,N,AREA,H,K,GAMMA,D_0,P_T,P_N,MAX_ITER,TOL,BW);
-
-obj = objective_uav(x, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW)
+uav_pos_flat = reshape(uav_pos', [], 1);
+obj = objective_uav(uav_pos_flat, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW)
 
