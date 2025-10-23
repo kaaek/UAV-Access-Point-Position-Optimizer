@@ -1,0 +1,11 @@
+%%
+% author: Khalil El Kaaki
+% 23/10/2025
+%%
+
+rng(42); % Generator seed
+
+M = 3;
+N = 2;
+AREA = 2000;
+
