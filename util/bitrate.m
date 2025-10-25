@@ -12,9 +12,9 @@ function br = bitrate(P_R, P_N, BW, A)
 %       BW  - Bandwidth in Hz (scalar)
 %       a   - association (matrix)
 %   Outputs:
-%       br  - Bitrate in bits per second (vector)
+%       br  - Bitrate in bps (vector)
 P_r_lin = 10.^(P_R/10);    % convert from dBm → mW
 P_n_lin = 10.^(P_N/10);    % convert from dBm → mW
 SNR = sum(P_r_lin .* A, 2) ./ P_n_lin;
-br = BW .* log2(1 + SNR);
+br = BW .* log2(1 + SNR); % bps
 end

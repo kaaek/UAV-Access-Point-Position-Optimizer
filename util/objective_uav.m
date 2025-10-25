@@ -14,7 +14,7 @@ function neg_sum_rate = objective_uav(x, user_pos, H, K, GAMMA, D_0, P_T, P_N, B
     %    D_0     - Reference distance for path loss calculations.
     %    P_T     - Transmit power of the UAVs.
     %    P_N     - Noise power.
-    %    BW      - Bandwidth available for communication.
+    %    BW      - Bandwidth available for communication, Hz
     %
     % Outputs:
     %    neg_sum_rate - Negative sum rate of the bitrates for the users, 
@@ -32,7 +32,7 @@ function neg_sum_rate = objective_uav(x, user_pos, H, K, GAMMA, D_0, P_T, P_N, B
 
     N       = numel(x)/2; % Therefore the number of UAVs is half the flattened coordinate array
     uav_pos = reshape(x, 2, N); % Reshapes the 1x2N Matrix to a 2xN matrix [[x1...xN]; [y1...yN]]
-    p_r     = p_received(user_pos, uav_pos, H, K, GAMMA, D_0, P_T);
+    p_r     = p_received(user_pos, uav_pos, H, K, GAMMA, D_0, P_T); % dBm
     a       = assoc(p_r);
     br      = bitrate(p_r, P_N, BW/size(user_pos,2), a);
     neg_sum_rate = -sum(br);  % fmincon minimizes this
