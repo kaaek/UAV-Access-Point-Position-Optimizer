@@ -36,4 +36,7 @@ function neg_sum_rate = objective_uav(x, user_pos, H, K, GAMMA, D_0, P_T, P_N, B
     a       = assoc(p_r);
     br      = bitrate(p_r, P_N, BW/size(user_pos,2), a);
     neg_sum_rate = -sum(br);  % fmincon minimizes this
+
+
+
 end

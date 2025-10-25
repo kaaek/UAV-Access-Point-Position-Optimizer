@@ -16,12 +16,32 @@ K           = 30;
 GAMMA       = 3;
 D_0         = 1;
 P_T         = 30;       % dBm
-P_N         = 2;        % dBm
+P_N         = -91;        % dBm 
 MAX_ITER    = 50;
 TOL         = 1e-3;     % Tolerance for k-means convergence
 BW          = 40;       % MHz
 
 [uav_pos, user_pos] = baselineSol(M,N,AREA,H,K,GAMMA,D_0,P_T,P_N,MAX_ITER,TOL,BW);
-uav_pos_flat = reshape(uav_pos', [], 1);
-obj = objective_uav(uav_pos_flat, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW);
+Rmin = 0.2E6;   % set minimum bit rate 
 
+x0 = reshape(uav_pos', [], 1);
+
+%Bounds
+lb = repelem([0;0], N);
+ub = repelem([AREA;AREA], N);
+opts = optimoptions('fmincon', 'Algorithm','interior-point', 'Display','iter');
+
+uav_pos_flat = reshape(uav_pos', [], 1);
+
+
+obj = objective_uav(uav_pos_flat, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW);
+[x_opt, fval] = fmincon(@(x)objective_uav(x,user_pos,H,K,GAMMA,D_0,P_T,P_N,BW), ...
+                        x0, [], [], [], [], lb, ub, ...
+                        @(x) nonlcon(x,user_pos,H,K,GAMMA,D_0,P_T,P_N,BW,Rmin), ...
+                        opts);
+uav_pos_opt =   reshape(x_opt, 2, N).';
+
+
+fprintf('Optimized UAV positions (meters):\n');
+format short g         
+disp(uav_pos_opt)
