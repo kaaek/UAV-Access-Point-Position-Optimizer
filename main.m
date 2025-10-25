@@ -25,9 +25,12 @@ Rmin        = 0.2E6;    % Set minimum bit rate
 % 1. Baseline solution (K-means)
 [uav_pos, user_pos] = baselineSol(M, N, AREA, H, K, GAMMA, D_0, P_T, P_N, MAX_ITER, TOL, BW_total);
 
-% 2. Optimize UAV positions (fmincon)
-opt_uav_pos = optimizeUAVPositions(N, AREA, uav_pos, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW_total, Rmin); % Outputs Nx2 matrix
+% 2. Optimize UAV positions (Global Search, built on top of fmincon)
+uav_pos_opt = optimizeUAVPositions(N, AREA, uav_pos, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW_total, Rmin); % Outputs Nx2 matrix
 
-% 3. Optimize Bandwidth allocation
-opt_uav_pos = opt_uav_pos.';   % now 2×N (transpose)
-[~, br_opt] = optimizeBandwidthAllocation(M, BW_total, user_pos, opt_uav_pos, H, K, GAMMA, D_0, P_T, P_N, Rmin);
+% 3. Optimize Bandwidth allocation (fmincon)
+uav_pos_opt = uav_pos_opt.';   % now 2×N (transpose)
+[~, br_opt] = optimizeBandwidthAllocation(M, BW_total, user_pos, uav_pos_opt, H, K, GAMMA, D_0, P_T, P_N, Rmin);
+
+writematrix(uav_pos_opt, 'uav_positions.csv');
+writematrix(br_opt, 'bitrates.csv');

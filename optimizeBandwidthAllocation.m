@@ -1,4 +1,27 @@
+%%
+% author: Khalil El Kaaki & Joe Abi Samra
+% 25/10/2025
+%%
+
 function [B_opt, br_opt] = optimizeBandwidthAllocation(M, BW_total, user_pos, opt_uav_pos, H, K, GAMMA, D_0, P_T, P_N, Rmin)
+%OPTIMIZEBANDWIDTHALLOCATION Optimize bandwidth allocation for users
+%   [B_OPT, BR_OPT] = OPTIMIZEBANDWIDTHALLOCATION(M, BW_TOTAL, USER_POS, 
+%   OPT_UAV_POS, H, K, GAMMA, D_0, P_T, P_N, RMIN) optimally allocates 
+%   bandwidth among M users given the total bandwidth BW_TOTAL. 
+%   The function takes into account user positions (USER_POS), the 
+%   position of the UAV (OPT_UAV_POS), channel conditions (H), 
+%   the number of users (K), the signal-to-noise ratio (GAMMA), 
+%   the reference distance (D_0), the transmit power (P_T), 
+%   the noise power (P_N), and the minimum required rate (RMIN).
+%
+%   Outputs:
+%   B_OPT - Optimized bandwidth allocation for each user (Hz)
+%   BR_OPT - Resulting bit rates for each user (bps)
+%
+%   Example:
+%   [B_opt, br_opt] = optimizeBandwidthAllocation(5, 100e6, user_positions, 
+%   uav_position, channel_conditions, num_users, snr_values, reference_distance, 
+%   transmit_power, noise_power, min_rate);
 
 B0 = ones(M,1) * (BW_total / M);    % fmincon's initial guess: uniform bandwidth allocation, Hz
 lb = zeros(M,1);                    % Lower bound, bps
@@ -12,20 +35,17 @@ a = assoc(p_r);
 % Objective Function
 br = @(B) bitrate(p_r, P_N, B, a);
 objective_fn = @(br) -sum(log(br)); % proportional fairness
-% objective_fn = @(br) -sum(br); % sumlink
 obj = @(B) objective_fn(br(B));
 
 nonlcon = @(B) qosConstraint(br(B), ...
                              Rmin);
-
 opts = optimoptions('fmincon', ...
-    'Algorithm', 'interior-point', ...
-    'Display', 'iter', ...
-    'MaxIterations', 1000, ...
-    'MaxFunctionEvaluations', 1e5, ...
-    'StepTolerance', 1e-12, ...
-    'OptimalityTolerance', 1e-6);
-
+  'Algorithm','interior-point', ...
+  'Display','iter', ...
+  'MaxIterations', 1000, ...
+  'MaxFunctionEvaluations', 5e5, ...
+  'StepTolerance', 1e-12, ...
+  'OptimalityTolerance', 1e-6);
 B_opt = fmincon(obj, B0, A, b, [], [], lb, ub, nonlcon, opts);
 
 % Calculate the resulting bitrate (due to optimal bandwidth allocation)

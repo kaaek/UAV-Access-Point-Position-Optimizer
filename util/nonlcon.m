@@ -1,3 +1,8 @@
+%%
+% author: Khalil El Kaaki & Joe Abi Samra
+%
+%%
+
 function [c, ceq] = nonlcon(x, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW, Rmin)
 % nonlcon - Nonlinear constraint function for optimization
 %

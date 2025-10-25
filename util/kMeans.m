@@ -2,7 +2,6 @@
 % author: Khalil El Kaaki & Joe Abi Samra
 % 23/10/2025
 %%
-
 function uav_pos = kMeans(user_pos, N, AREA, MAX_ITER, TOL)
 % kMeans - Places UAVs based on user positions using k-means clustering
 %
