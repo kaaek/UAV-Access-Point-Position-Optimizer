@@ -17,8 +17,8 @@ scatter(user_pos(1, :), user_pos(2, :), 'b', 'filled'); % Users in blue
 hold on;
 scatter(uav_pos(1, :), uav_pos(2, :), 'r', 'filled'); % UAVs in red
 title('Scatter Plot of Users and UAVs');
-xlabel('X Position');
-ylabel('Y Position');
+xlabel('X Position (meters)');
+ylabel('Y Position (meters)');
 legend('Users', 'UAVs');
 grid on;
 
