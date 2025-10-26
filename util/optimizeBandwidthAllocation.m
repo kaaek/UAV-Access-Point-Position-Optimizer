@@ -3,7 +3,7 @@
 % 25/10/2025
 %%
 
-function [B_opt, br_opt, sum_br_opt_mbps] = optimizeBandwidthAllocation(M, BW_total, user_pos, opt_uav_pos, H, K, GAMMA, D_0, P_T, P_N, Rmin)
+function [B_opt, br_opt, sum_br_opt_mbps] = optimizeBandwidthAllocation(M, BW_total, user_pos, opt_uav_pos, H_M, H, F, P_T, P_N, Rmin)
 %OPTIMIZEBANDWIDTHALLOCATION Optimize bandwidth allocation for users
 %   [B_OPT, BR_OPT] = OPTIMIZEBANDWIDTHALLOCATION(M, BW_TOTAL, USER_POS, 
 %   OPT_UAV_POS, H, K, GAMMA, D_0, P_T, P_N, RMIN) optimally allocates 
@@ -29,7 +29,7 @@ ub = ones(M,1) * BW_total;          % Upper bound: no user gets more than total 
 A = ones(1,M);
 b = BW_total;                       % Hz
 
-p_r = p_received(user_pos, opt_uav_pos, H, K, GAMMA, D_0, P_T);
+p_r = p_received(user_pos, opt_uav_pos, H_M, H, F, P_T);
 a = assoc(p_r);
 
 % Objective Function

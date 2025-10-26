@@ -3,7 +3,7 @@
 % 25/10/2025
 %%
 
-function uav_pos_opt = optimizeUAVPositions(N, AREA, uav_pos, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW, Rmin)
+function uav_pos_opt = optimizeUAVPositions(N, AREA, uav_pos, user_pos, H_M, H, F, P_T, P_N, BW, Rmin)
 % This function optimizes the positions of UAVs to maximize the proportional fairness of the bitrate received by users.
 %
 % Inputs:
@@ -27,8 +27,9 @@ function uav_pos_opt = optimizeUAVPositions(N, AREA, uav_pos, user_pos, H, K, GA
 %   uav_pos_opt = optimizeUAVPositions(N, AREA, uav_pos, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW, Rmin);
 
 % Bounds
+side = ceil(sqrt(AREA));
 lb = repelem([0;0], N);
-ub = repelem([AREA;AREA], N);
+ub = repelem([side;side], N);
 
 opts = optimoptions('fmincon', ...
   'Algorithm','interior-point', ...
@@ -42,17 +43,17 @@ uav_pos_flat = reshape(uav_pos', [], 1); % Flatten the matrix (needed so that it
 
 % Objective Function
 br = @(x) bitrate( ...
-                       p_received(user_pos, reshape(x,2,N), H, K, GAMMA, D_0, P_T), ...
+                       p_received(user_pos, reshape(x,2,N), H_M, H, F, P_T), ...
                        P_N, ...
                        BW/size(user_pos,2), ...
-                       assoc(p_received(user_pos, reshape(x,2,N), H, K, GAMMA, D_0, P_T)) ...
+                       assoc(p_received(user_pos, reshape(x,2,N), H_M, H, F, P_T)) ...
                      );
 objective_fn = @(br) -sum(log(br)); % proportional fairness
 obj = @(x) objective_fn(br(x));
 
 % Global Solver
 problem = createOptimProblem('fmincon','x0',uav_pos_flat,'objective',obj, ...
-                            'lb',lb,'ub',ub,'nonlcon',@(x) nonlcon(x,user_pos,H,K,GAMMA,D_0,P_T,P_N,BW,Rmin), ...
+                            'lb',lb,'ub',ub,'nonlcon',@(x) nonlcon(x, user_pos, H_M, H, F, P_T, P_N, BW, Rmin), ...
                             'options',opts);
 gs = GlobalSearch('Display','iter','MaxTime', 600);
 [x_opt,~] = run(gs, problem);

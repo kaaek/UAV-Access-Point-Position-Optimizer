@@ -3,7 +3,7 @@
 % 23/10/2025
 %% 
 
-function [uav_pos, baseline_br, sumlink_mbps] = kMeansSol(user_pos, M, N, AREA, H, K, GAMMA, D_0, P_T, P_N, MAX_ITER, TOL, BW)
+function [uav_pos, baseline_br, sumlink_mbps] = kMeansSol(user_pos, M, N, AREA, H_M, H, F, P_T, P_N, MAX_ITER, TOL, BW)
 % baselineSol - Computes the optimal positions for UAVs and users, and calculates the baseline bit rate.
 %
 % Syntax: [uav_pos, user_pos] = baselineSol(M, N, AREA, H, K, GAMMA, D_0, P_T, P_N, MAX_ITER, TOL, BW)
@@ -33,7 +33,7 @@ function [uav_pos, baseline_br, sumlink_mbps] = kMeansSol(user_pos, M, N, AREA, 
 %   the baseline bit rate for each user based on the received power.
 
 uav_pos         = kMeans(user_pos, N, AREA, MAX_ITER, TOL);             % meters
-p_r             = p_received(user_pos, uav_pos, H, K, GAMMA, D_0, P_T); % dBm
+p_r             = p_received(user_pos, uav_pos, H_M, H, F, P_T); % dBm
 a               = assoc(p_r);
 baseline_br     = bitrate(p_r, P_N, (BW/M), a);                         % bps
 sumlink         = sum(baseline_br);

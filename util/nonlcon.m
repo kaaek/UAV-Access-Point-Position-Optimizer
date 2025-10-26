@@ -3,7 +3,7 @@
 %
 %%
 
-function [c, ceq] = nonlcon(x, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW, Rmin)
+function [c, ceq] = nonlcon(x, user_pos, H_M, H, F, P_T, P_N, BW, Rmin)
 % nonlcon - Nonlinear constraint function for optimization
 %
 % Syntax: [c, ceq] = nonlcon(x, user_pos, H, K, GAMMA, D_0, P_T, P_N, BW, Rmin)
@@ -37,7 +37,7 @@ N = numel(x)/2;
 uav_pos = reshape(x, 2, N);
 
 % received "power" matrix 
-p_r_raw = p_received(user_pos, uav_pos, H, K, GAMMA, D_0, P_T);   % users x UAVs
+p_r_raw = p_received(user_pos, uav_pos, H_M, H, F, P_T);   % users x UAVs
 
 % Convert to linear Watts safely
 % Case A: p_r_raw is in dBm (typical: negatives like -80 dBm)

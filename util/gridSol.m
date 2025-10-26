@@ -1,4 +1,4 @@
-function [uav_pos, baseline_br, sumlink_mbps] = gridSol(user_pos, M, N, AREA, H, K, GAMMA, D_0, P_T, P_N, BW)
+function [uav_pos, baseline_br, sumlink_mbps] = gridSol(user_pos, M, N, AREA, H_M, H, F, P_T, P_N, BW)
 % GRIDSOL - Computes UAV positions and baseline bitrate for a grid layout.
 %
 % Syntax:  [uav_pos, baseline_br, sumlink_mbps] = gridSol(user_pos, M, N, AREA, H, K, GAMMA, D_0, P_T, P_N, MAX_ITER, TOL, BW)
@@ -25,11 +25,11 @@ function [uav_pos, baseline_br, sumlink_mbps] = gridSol(user_pos, M, N, AREA, H,
 %
 % Example:
 %    [uav_pos, baseline_br, sumlink_mbps] = gridSol(user_pos, 64, 10, 10000, 100, 5, 2, 1, 30, -100, 1000, 1e-6, 20e6);
-side = ceil(sqrt(AREA));
-uav_pos = zeros(2, N);
-uav_pos(1, :) = linspace(0, side, N);
-uav_pos(2, :) = linspace(0, side, N);
-p_r             = p_received(user_pos, uav_pos, H, K, GAMMA, D_0, P_T); % dBm
+side            = ceil(sqrt(AREA));
+uav_pos         = zeros(2, N);
+uav_pos(1, :)   = linspace(0, side, N);
+uav_pos(2, :)   = linspace(0, side, N);
+p_r             = p_received(user_pos, uav_pos, H_M, H, F, P_T); % dBm
 a               = assoc(p_r);
 baseline_br     = bitrate(p_r, P_N, (BW/M), a);                         % bps
 sumlink         = sum(baseline_br);
