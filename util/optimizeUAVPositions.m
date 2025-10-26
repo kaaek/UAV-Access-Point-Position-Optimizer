@@ -32,11 +32,11 @@ ub = repelem([AREA;AREA], N);
 
 opts = optimoptions('fmincon', ...
   'Algorithm','interior-point', ...
-  'Display','iter', ...
-  'MaxIterations', 1000, ...
+  'Display','none', ...
+  'MaxIterations', 50, ...
   'MaxFunctionEvaluations', 5e5, ...
-  'StepTolerance', 1e-12, ...
-  'OptimalityTolerance', 1e-6);
+  'StepTolerance', 1e-6, ...
+  'OptimalityTolerance', 1e-3);
 
 uav_pos_flat = reshape(uav_pos', [], 1); % Flatten the matrix (needed so that it can be passed to fmincon), now looks like: [x1, y1, x2, y2, ..., xN, yN]
 
@@ -68,15 +68,4 @@ uav_pos_opt = reshape(x_opt, 2, N).'; % Builds from a flat coordinates vector an
 fprintf('Optimized UAV positions (meters):\n');
 format short g         
 disp(uav_pos_opt)
-
-figure;
-scatter(user_pos(1,:), user_pos(2,:), 'b', 'filled');
-hold on;
-scatter(uav_pos_opt(:,1), uav_pos_opt(:,2), 'r', 'filled'); % Plot optimized UAV positions
-xlabel('X Position (meters)');
-ylabel('Y Position (meters)');
-title('User and Optimized UAV Positions');
-legend('Users', 'UAVs');
-grid on;
-hold off;
 end

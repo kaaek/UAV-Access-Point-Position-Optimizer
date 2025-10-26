@@ -1,65 +1,4 @@
-%%
-% author: Khalil El Kaaki & Joe Abi Samra
-% 23/10/2025
-%%
-
-clc, clearvars
-addpath("util\");
-
-rng(42);                % Generator seed
-
-M           = 50;       % Users
-N           = 5;        % UAVs
-AREA        = 40000;    % meters squared
-H           = 100;      % height, meters
-K           = 30;       % dB
-GAMMA       = 3;        
-D_0         = 1;        % meters
-P_T         = 30;       % dBm
-P_N         = -91;      % dBm 
-MAX_ITER    = 50;
-TOL         = 1e-3;     % Tolerance for k-means convergence
-BW_total    = 40e6;     % Hz
-Rmin        = 0.2E6;    % Set minimum bit rate
-user_pos    = ceil(sqrt(AREA)) * rand(2, M); 
-
-% 1. N sweep
-N_vals = [2 3 4 5 6 8 10];
-sumlink_mbps_kmeans = zeros(length(N_vals), 1);
-sumlink_mbps_grid = zeros(length(N_vals), 1);
-sumlink_mbps_random = zeros(length(N_vals), 1);
-sumlink_mbps_fm_kmeans = zeros(length(N_vals), 1);
-sumlink_mbps_fm_grid = zeros(length(N_vals), 1);
-sumlink_mbps_fm_random = zeros(length(N_vals), 1);
-for i = 1:length(N_vals)
-    n = N_vals(i);
-    [sumlink_mbps_kmeans, sumlink_mbps_grid, sumlink_mbps_random, sumlink_mbps_fm_kmeans, sumlink_mbps_fm_grid, sumlink_mbps_fm_random] = analysis(M, n, AREA, H, K, GAMMA, D_0, P_T, P_N, MAX_ITER, TOL, BW_total, Rmin, user_pos);
-    
-    sumlink_mbps_kmeans(i) = sumlink_mbps_kmeans;
-    sumlink_mbps_grid(i) = sumlink_mbps_grid;
-    sumlink_mbps_random(i) = sumlink_mbps_random;
-    sumlink_mbps_fm_kmeans(i) = sumlink_mbps_fm_kmeans;
-    sumlink_mbps_fm_grid(i) = sumlink_mbps_fm_grid;
-    sumlink_mbps_fm_random(i) = sumlink_mbps_fm_random;
-end
-
-figure('Name', 'Variation of Bitrate With Number of UAVs');
-hold on;
-plot(N_vals, sumlink_mbps_kmeans, '-o', 'DisplayName', 'K-Means');
-plot(N_vals, sumlink_mbps_grid, '-s', 'DisplayName', 'Grid');
-plot(N_vals, sumlink_mbps_random, '-d', 'DisplayName', 'Random');
-plot(N_vals, sumlink_mbps_fm_kmeans, '-^', 'DisplayName', 'K-Means Optimized');
-plot(N_vals, sumlink_mbps_fm_grid, '-v', 'DisplayName', 'Grid Optimized');
-plot(N_vals, sumlink_mbps_fm_random, '-x', 'DisplayName', 'Random Optimized');
-hold off;
-
-title('Bitrate vs Number of UAVs');
-xlabel('Number of UAVs (N)');
-ylabel('Bitrate (Mbps)');
-legend('show');
-grid on;
-
-% If for one N:
+function [sumlink_mbps_kmeans, sumlink_mbps_grid, sumlink_mbps_random, sumlink_mbps_fm_kmeans, sumlink_mbps_fm_grid, sumlink_mbps_fm_random] = analysis (M, N, AREA, H, K, GAMMA, D_0, P_T, P_N, MAX_ITER, TOL, BW_total, Rmin, user_pos)
 % 1. Baseline solution (K-means)
 [uav_pos_kmeans, br_kmeans, sumlink_mbps_kmeans] = kMeansSol(user_pos, M, N, AREA, H, K, GAMMA, D_0, P_T, P_N, MAX_ITER, TOL, BW_total);
 
@@ -68,7 +7,7 @@ subplot(1, 2, 1);
 scatter(user_pos(1, :), user_pos(2, :), 'b', 'filled');
 hold on;
 scatter(uav_pos_kmeans(1, :), uav_pos_kmeans(2, :), 'r', 'filled');
-title('Users and K-Means UAV Locations');
+title(['Users and K-Means UAV Locations (N = ' num2str(N) ')']);
 xlabel('X Position (meters)');
 ylabel('Y Position (meters)');
 legend('Users', 'UAVs');
@@ -76,7 +15,7 @@ grid on;
 
 subplot(1, 2, 2);
 bar(br_kmeans(:));
-title('K-Means Bit Rate per User');
+title(['K-Means Bit Rate per User (N = ' num2str(N) ')']);
 xlabel('User Index');
 ylabel('Baseline Bit Rate (bps)');
 grid on;
@@ -89,7 +28,7 @@ subplot(1, 2, 1);
 scatter(user_pos(1, :), user_pos(2, :), 'b', 'filled');
 hold on;
 scatter(uav_pos_grid(1, :), uav_pos_grid(2, :), 'r', 'filled');
-title('Users and Grid UAV Locations');
+title(['Users and Grid UAV Locations (N = ' num2str(N) ')']);
 xlabel('X Position (meters)');
 ylabel('Y Position (meters)');
 legend('Users', 'UAVs');
@@ -97,7 +36,7 @@ grid on;
 
 subplot(1, 2, 2);
 bar(br_grid(:));
-title('Grid Bit Rate per User');
+title(['Grid Bit Rate per User (N = ' num2str(N) ')']);
 xlabel('User Index');
 ylabel('Baseline Bit Rate (bps)');
 grid on;
@@ -110,7 +49,7 @@ subplot(1, 2, 1);
 scatter(user_pos(1, :), user_pos(2, :), 'b', 'filled');
 hold on;
 scatter(uav_pos_random(1, :), uav_pos_random(2, :), 'r', 'filled');
-title('Users and Random UAV Locations');
+title(['Users and Random UAV Locations (N = ' num2str(N) ')']);
 xlabel('X Position (meters)');
 ylabel('Y Position (meters)');
 legend('Users', 'UAVs');
@@ -118,7 +57,7 @@ grid on;
 
 subplot(1, 2, 2);
 bar(baseline_br(:));
-title('Random Bit Rate per User');
+title(['Random Bit Rate per User (N = ' num2str(N) ')']);
 xlabel('User Index');
 ylabel('Baseline Bit Rate (bps)');
 grid on;
@@ -144,14 +83,14 @@ hold on;
 scatter(uav_pos_gs_kmeans(1,:), uav_pos_gs_kmeans(2,:), 'r', 'filled');
 xlabel('X Position (meters)');
 ylabel('Y Position (meters)');
-title('User and Optimized UAV Positions (K-Means Starting Point)');
+title(['User and Optimized UAV Positions (K-Means Starting Point, N = ' num2str(N) ')']);
 legend('Users', 'UAVs');
 grid on;
 hold off;
 
 subplot(1, 2, 2);
 bar(br_kmeans);
-title('Optimized Bit Rate per User (K-means Starting Point)');
+title(['Optimized Bit Rate per User (K-means Starting Point, N = ' num2str(N) ')']);
 xlabel('User Index');
 ylabel('Bit Rate (bps)');
 grid on;
@@ -164,14 +103,14 @@ hold on;
 scatter(uav_pos_gs_grid(1,:), uav_pos_gs_grid(2,:), 'r', 'filled');
 xlabel('X Position (meters)');
 ylabel('Y Position (meters)');
-title('User and Optimized UAV Positions (Grid Starting Points)');
+title(['User and Optimized UAV Positions (Grid Starting Points, N = ' num2str(N) ')']);
 legend('Users', 'UAVs');
 grid on;
 hold off;
 
 subplot(1, 2, 2);
 bar(br_grid);
-title('Optimized Bit Rate per User (Grid Starting Points)');
+title(['Optimized Bit Rate per User (Grid Starting Points, N = ' num2str(N) ')']);
 xlabel('User Index');
 ylabel('Bit Rate (bps)');
 grid on;
@@ -184,14 +123,14 @@ hold on;
 scatter(uav_pos_gs_random(1,:), uav_pos_gs_random(2,:), 'r', 'filled');
 xlabel('X Position (meters)');
 ylabel('Y Position (meters)');
-title('User and Optimized UAV Positions (Random Starting Points)');
+title(['User and Optimized UAV Positions (Random Starting Points, N = ' num2str(N) ')']);
 legend('Users', 'UAVs');
 grid on;
 hold off;
 
 subplot(1, 2, 2);
 bar(br_random);
-title('Optimized Bit Rate per User (Random Starting Points)');
+title(['Optimized Bit Rate per User (Random Starting Points, N = ' num2str(N) ')']);
 xlabel('User Index');
 ylabel('Bit Rate (bps)');
 grid on;
@@ -209,25 +148,4 @@ fprintf('Sum of k-mens bit rate after optimization: %.2f Mbps\n', sumlink_mbps_f
 fprintf('Sum of grid-placement bit rate after optimization: %.2f Mbps\n', sumlink_mbps_fm_grid);
 fprintf('Sum of random-placement bit rate after optimization: %.2f Mbps\n', sumlink_mbps_fm_random);
 fprintf('--------------------------------------------------\n');
-
-% H sweep
-H_vals = [50 100 150 200 250];
-for i = 1:length(H_vals)
-    h = H_vals(i);
-    analysis(M, N, AREA, h, K, GAMMA, D_0, P_T, P_N, MAX_ITER, TOL, BW_total, Rmin, user_pos);
 end
-
-figs = findall(0, 'Type', 'figure');
-outdir = 'figures';
-if ~exist(outdir, 'dir')
-    mkdir(outdir);
-end
-
-for i = 1:numel(figs)
-    figname = fullfile(outdir, sprintf('figure_%d.png', i));
-    saveas(figs(i), figname);
-end
-
-
-% writematrix(uav_pos_gs_kmeans, 'uav_positions.csv');
-% writematrix(br_kmeans, 'bitrates.csv');

@@ -3,7 +3,7 @@
 % 25/10/2025
 %%
 
-function [B_opt, br_opt] = optimizeBandwidthAllocation(M, BW_total, user_pos, opt_uav_pos, H, K, GAMMA, D_0, P_T, P_N, Rmin)
+function [B_opt, br_opt, sum_br_opt_mbps] = optimizeBandwidthAllocation(M, BW_total, user_pos, opt_uav_pos, H, K, GAMMA, D_0, P_T, P_N, Rmin)
 %OPTIMIZEBANDWIDTHALLOCATION Optimize bandwidth allocation for users
 %   [B_OPT, BR_OPT] = OPTIMIZEBANDWIDTHALLOCATION(M, BW_TOTAL, USER_POS, 
 %   OPT_UAV_POS, H, K, GAMMA, D_0, P_T, P_N, RMIN) optimally allocates 
@@ -41,29 +41,15 @@ nonlcon = @(B) qosConstraint(br(B), ...
                              Rmin);
 opts = optimoptions('fmincon', ...
   'Algorithm','interior-point', ...
-  'Display','iter', ...
-  'MaxIterations', 1000, ...
+  'Display','none', ...
+  'MaxIterations', 50, ...
   'MaxFunctionEvaluations', 5e5, ...
-  'StepTolerance', 1e-12, ...
-  'OptimalityTolerance', 1e-6);
+  'StepTolerance', 1e-6, ...
+  'OptimalityTolerance', 1e-3);
+
 B_opt = fmincon(obj, B0, A, b, [], [], lb, ub, nonlcon, opts);
 
 % Calculate the resulting bitrate (due to optimal bandwidth allocation)
 br_opt = bitrate(p_r, P_N, B_opt, a); % bps
-sum_br_opt = sum(br_opt);
-fprintf('Sum of bit rates after optimization: %.2f Mbps\n', sum_br_opt/1e6);
-
-figure;
-bar(br_opt);
-title('Optimized Bit Rate per User');
-xlabel('User Index');
-ylabel('Bit Rate (bps)');
-grid on;
-
-figure;
-bar(B_opt);
-title('Optimized Bandwidth Allocation per User');
-xlabel('User Index');
-ylabel('Bandwidth (Hz)');
-grid on;
+sum_br_opt_mbps = sum(br_opt)/1e6;
 end
