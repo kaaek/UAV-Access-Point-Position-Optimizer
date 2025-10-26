@@ -48,8 +48,11 @@ br = @(x) bitrate( ...
                        BW/size(user_pos,2), ...
                        assoc(p_received(user_pos, reshape(x,2,N), H_M, H, F, P_T)) ...
                      );
-objective_fn = @(br) -sum(log(br)); % proportional fairness
-obj = @(x) objective_fn(br(x));
+% objective_fn = @(br) -sum(log(br)); % proportional fairness
+% % br_x is a function of x (UAV coordinates)
+alpha = 0.7;
+obj = @(x) - ( alpha * sum(br(x)) + (1-alpha) * sum( log( max(br(x), 1e-9) ) ) );
+% obj = @(x) objective_fn(br(x));
 
 % Global Solver
 problem = createOptimProblem('fmincon','x0',uav_pos_flat,'objective',obj, ...

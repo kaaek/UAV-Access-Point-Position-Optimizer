@@ -34,8 +34,13 @@ a = assoc(p_r);
 
 % Objective Function
 br = @(B) bitrate(p_r, P_N, B, a);
-objective_fn = @(br) -sum(log(br)); % proportional fairness
-obj = @(B) objective_fn(br(B));
+% objective_fn = @(br) -sum(log(br)); % proportional fairness
+% obj = @(B) objective_fn(br(B));
+
+% br is @(B) bitrate(...)
+alpha = 0.7; % choose default (changeable in sweep)
+obj = @(B) - ( alpha * sum( br(B) ) + (1 - alpha) * sum( log(max(br(B), 1e-9)) ) );
+
 
 nonlcon = @(B) qosConstraint(br(B), ...
                              Rmin);
