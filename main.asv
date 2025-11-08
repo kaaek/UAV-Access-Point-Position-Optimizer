@@ -14,7 +14,7 @@ addpath("util\Clustering\Hierarchical");
 rng(42);                % Generator seed
 M           = 50;       % Users
 N           = 5;        % UAVs
-AREA        = 9000000;    % meters squared
+AREA        = 9e6;    % meters squared
 H           = 100;      % height, meters
 H_M         = 1.5;
 F           = 500e6;    % Hz
@@ -26,19 +26,158 @@ P_N         = -91;      % dBm
 MAX_ITER    = 50;
 TOL         = 1e-3;     % Tolerance for k-means convergence
 BW_total    = 40e6;     % Hz
-Rmin        = 0.2E6;    % Set minimum bit rate
+R_MIN        = 0.2E6;    % Set minimum bit rate
 SIDE = sqrt(AREA);
-user_pos = SIDE * rand(2,M);
 
-% % [uav_pos_kmeans, ~, ~] = kMeansSolution(user_pos, M, N, AREA, H_M, H, F, P_T, P_N, MAX_ITER, TOL, BW_total);
-% uav_pos_kmeans = kMeans(user_pos, N, AREA, MAX_ITER, TOL);
-% [uav_pos_opt, Bandwidth_opt, Rate_opt] = optimizeNetwork(M, N, uav_pos_kmeans, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
-% plotNetwork(user_pos, uav_pos_opt, Rate_opt, H_M, H, F, P_T, 'Network Visualization');
-uav_pos_hier = hierarchicalUAV(user_pos, N);
-[uav_pos_opt, Bandwidth_opt, Rate_opt] = optimizeNetwork(M, N, uav_pos_hier, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
-plotNetwork(user_pos, uav_pos_opt, Rate_opt, H_M, H, F, P_T, 'HierarchyVisualization');
+% user_pos = SIDE * rand(2,M);
+% [uav_pos_kmeans, baseline_br, sumlink] = kMeansUAV(user_pos, M, N, AREA, H_M, H, F, P_T, P_N, MAX_ITER, TOL, BW_total);
+% plotNetwork(user_pos, uav_pos_kmeans, baseline_br, H_M, H, F, P_T, 'Reference K-Means Clustering');
+% % % Optimized K means
+% [uav_pos_opt_kmeans, ~, Rate_opt_kmeans] = optimizeNetwork(M, N, uav_pos_kmeans, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
+% plotNetwork(user_pos, uav_pos_opt_kmeans, Rate_opt_kmeans, H_M, H, F, P_T, 'OPtimized K-Means Clustering');
+% % % 
+% [uav_pos_hier, baseline_br, ~] = hierarchicalUAV(user_pos, N);
+% plotNetwork(user_pos, uav_pos_hier, baseline_br, H_M, H, F, P_T, 'Reference Hierarchy Clustering');
+% % % Optimized Hierarchical
+% [uav_pos_opt_hier, ~, Rate_opt_hier] = optimizeNetwork(M, N, uav_pos_hier, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
+% plotNetwork(user_pos, uav_pos_opt_hier, Rate_opt_hier, H_M, H, F, P_T, 'Hierarchy');
 
-% % 1. N sweep
+N_vals      = [1 2 6 10 14 18 24 30];
+M_vals      = [20 50 100 150 200 300 500 700];
+BW_vals     = [5e6, 10e6, 20e6, 40e6, 80e6];
+P_t_vals    = [20, 30, 40]; % dBm
+Rmin_vals   = [50e3, 200e3, 1e6]; % bps
+Area_vals   = [1e6, 2.25e6, 4e6, 6.25e6, 9e6, 12.25e6, 16e6]; % m^2
+
+sumrate_kmeans_ref_arr  = zeros(length(N_vals), 1);
+sumrate_kmeans_opt_arr  = zeros(length(N_vals), 1);
+sumrate_hier_ref_arr    = zeros(length(N_vals), 1);
+sumrate_hier_opt_arr    = zeros(length(N_vals), 1);
+trials = 50;
+% To-Do: confidence interval
+for i = 1:length(N_vals)
+    n = N_vals(i);
+    for j = 1:trials
+        rng(j);                         % Renew the seed for each iteration
+        user_pos = SIDE * rand(2,M);    % Renew user positions
+        % a. K-means Clustering
+        [uav_pos_kmeans, ~, sumrate]        = kMeansUAV(user_pos, M, n, AREA, H_M, H, F, P_T, P_N, MAX_ITER, TOL, BW_total);
+        sumrate_kmeans_ref_arr(1,i)         = sumrate;
+        [uav_pos_opt_kmeans, ~, ~, sumrate] = optimizeNetwork(M, n, uav_pos_kmeans, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, R_MIN);
+        sumrate_kmeans_opt_arr(1,i)         = sumrate;
+        % b. Hierarchical Clustering
+        [uav_pos_hier, ~, sumrate]          = hierarchicalUAV(user_pos, n);
+        sumrate_hier_ref_arr(1,i)           = sumrate;
+        [uav_pos_opt_hier, ~, ~, sumrate]   = optimizeNetwork(M, n, uav_pos_hier, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, R_MIN);
+        sumrate_hier_opt_arr(1,i)           = sumrate;
+    end
+end
+plotSweep (N_vals, sumrate_kmeans_ref_arr, sumrate_kmeans_opt_arr, sumrate_hier_ref_arr, sumrate_hier_opt_arr, 'Number of UAVs (N)', 'Variation of the Sum Rate Relative to the Number of UAVs')
+
+
+for i = 1:length(M_vals)
+    m = M_vals(i);
+    for j = 1:trials
+        rng(j);                         % Renew the seed for each iteration
+        user_pos = SIDE * rand(2,m);    % Renew user positions
+        % a. K-means Clustering
+        [uav_pos_kmeans, ~, sumrate]        = kMeansUAV(user_pos, m, N, AREA, H_M, H, F, P_T, P_N, MAX_ITER, TOL, BW_total);
+        sumrate_kmeans_ref_arr(1,i)         = sumrate;
+        [uav_pos_opt_kmeans, ~, ~, sumrate] = optimizeNetwork(m, N, uav_pos_kmeans, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, R_MIN);
+        sumrate_kmeans_opt_arr(1,i)         = sumrate;
+        % b. Hierarchical Clustering
+        [uav_pos_hier, ~, sumrate]          = hierarchicalUAV(user_pos, N);
+        sumrate_hier_ref_arr(1,i)           = sumrate;
+        [uav_pos_opt_hier, ~, ~, sumrate]   = optimizeNetwork(m, N, uav_pos_hier, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, R_MIN);
+        sumrate_hier_opt_arr(1,i)           = sumrate;
+    end
+end
+plotSweep (M_vals, sumrate_kmeans_ref_arr, sumrate_kmeans_opt_arr, sumrate_hier_ref_arr, sumrate_hier_opt_arr, 'Number of Users (M)', 'Variation of the Sum Rate Relative to the Number of Users')
+
+
+for i = 1:length(BW_vals)
+    bw = BW_vals(i);
+    for j = 1:trials
+        rng(j);                         % Renew the seed for each iteration
+        user_pos = SIDE * rand(2,m);    % Renew user positions
+        % a. K-means Clustering
+        [uav_pos_kmeans, ~, sumrate]        = kMeansUAV(user_pos, M, N, AREA, H_M, H, F, P_T, P_N, MAX_ITER, TOL, bw);
+        sumrate_kmeans_ref_arr(1,i)         = sumrate;
+        [uav_pos_opt_kmeans, ~, ~, sumrate] = optimizeNetwork(M, N, uav_pos_kmeans, bw, AREA, user_pos, H_M, H, F, P_T, P_N, R_MIN);
+        sumrate_kmeans_opt_arr(1,i)         = sumrate;
+        % b. Hierarchical Clustering
+        [uav_pos_hier, ~, sumrate]          = hierarchicalUAV(user_pos, N);
+        sumrate_hier_ref_arr(1,i)           = sumrate;
+        [uav_pos_opt_hier, ~, ~, sumrate]   = optimizeNetwork(M, N, uav_pos_hier, bw, AREA, user_pos, H_M, H, F, P_T, P_N, R_MIN);
+        sumrate_hier_opt_arr(1,i)           = sumrate;
+    end
+end
+plotSweep (BW_vals, sumrate_kmeans_ref_arr, sumrate_kmeans_opt_arr, sumrate_hier_ref_arr, sumrate_hier_opt_arr, 'Total Bandwidth (Hz)', "Variation of the Sum Rate Relative to the Total Bandwidth")
+
+
+for i = 1:length(BW_vals)
+    p_t = P_t_vals(i);
+    for j = 1:trials
+        rng(j);                         % Renew the seed for each iteration
+        user_pos = SIDE * rand(2,m);    % Renew user positions
+        % a. K-means Clustering
+        [uav_pos_kmeans, ~, sumrate]        = kMeansUAV(user_pos, M, N, AREA, H_M, H, F, p_t, P_N, MAX_ITER, TOL, BW_total);
+        sumrate_kmeans_ref_arr(1,i)         = sumrate;
+        [uav_pos_opt_kmeans, ~, ~, sumrate] = optimizeNetwork(M, N, uav_pos_kmeans, bw, AREA, user_pos, H_M, H, F, p_t, P_N, R_MIN);
+        sumrate_kmeans_opt_arr(1,i)         = sumrate;
+        % b. Hierarchical Clustering
+        [uav_pos_hier, ~, sumrate]          = hierarchicalUAV(user_pos, N);
+        sumrate_hier_ref_arr(1,i)           = sumrate;
+        [uav_pos_opt_hier, ~, ~, sumrate]   = optimizeNetwork(M, N, uav_pos_hier, bw, AREA, user_pos, H_M, H, F, p_t, P_N, R_MIN);
+        sumrate_hier_opt_arr(1,i)           = sumrate;
+    end
+end
+plotSweep (N_vals, sumrate_kmeans_ref_arr, sumrate_kmeans_opt_arr, sumrate_hier_ref_arr, sumrate_hier_opt_arr, 'Transmit Power (dBm)', "Variation of the Sum Rate Relative to the Total Bandwidth")
+
+
+for i = 1:length(Rmin_vals)
+    Rmin = Rmin_vals(i);
+    for j = 1:trials
+        rng(j);                         % Renew the seed for each iteration
+        user_pos = SIDE * rand(2,m);    % Renew user positions
+        % a. K-means Clustering
+        [uav_pos_kmeans, ~, sumrate]        = kMeansUAV(user_pos, M, N, AREA, H_M, H, F, P_T, P_N, MAX_ITER, TOL, BW_total);
+        sumrate_kmeans_ref_arr(1,i)         = sumrate;
+        [uav_pos_opt_kmeans, ~, ~, sumrate] = optimizeNetwork(M, N, uav_pos_kmeans, bw, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
+        sumrate_kmeans_opt_arr(1,i)         = sumrate;
+        % b. Hierarchical Clustering
+        [uav_pos_hier, ~, sumrate]          = hierarchicalUAV(user_pos, N);
+        sumrate_hier_ref_arr(1,i)           = sumrate;
+        [uav_pos_opt_hier, ~, ~, sumrate]   = optimizeNetwork(M, N, uav_pos_hier, bw, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
+        sumrate_hier_opt_arr(1,i)           = sumrate;
+    end
+end
+plotSweep (N_vals, sumrate_kmeans_ref_arr, sumrate_kmeans_opt_arr, sumrate_hier_ref_arr, sumrate_hier_opt_arr)
+for i = 1:length(Area_vals)
+    area = Area_vals(i);
+    for j = 1:trials
+        rng(j);                         % Renew the seed for each iteration
+        user_pos = SIDE * rand(2,m);    % Renew user positions
+        % a. K-means Clustering
+        [uav_pos_kmeans, ~, sumrate]        = kMeansUAV(user_pos, M, N, area, H_M, H, F, P_T, P_N, MAX_ITER, TOL, BW_total);
+        sumrate_kmeans_ref_arr(1,i)         = sumrate;
+        [uav_pos_opt_kmeans, ~, ~, sumrate] = optimizeNetwork(M, N, uav_pos_kmeans, bw, area, user_pos, H_M, H, F, P_T, P_N, R_MIN);
+        sumrate_kmeans_opt_arr(1,i)         = sumrate;
+        % b. Hierarchical Clustering
+        [uav_pos_hier, ~, sumrate]          = hierarchicalUAV(user_pos, N);
+        sumrate_hier_ref_arr(1,i)           = sumrate;
+        [uav_pos_opt_hier, ~, ~, sumrate]   = optimizeNetwork(M, N, uav_pos_hier, bw, area, user_pos, H_M, H, F, P_T, P_N, R_MIN);
+        sumrate_hier_opt_arr(1,i)           = sumrate;
+    end
+end
+
+% uav_pos         = kMeans(user_pos, N, AREA, MAX_ITER, TOL);             % meters
+% p_r             = p_received(user_pos, uav_pos, H_M, H, F, P_T);        % dBm
+% a               = association(p_r);
+% baseline_br     = bitrate(p_r, P_N, (BW/M), a);                         % bps
+% sumlink         = sum(baseline_br);
+
+% 1. N sweep
 % N_vals = [2 3 4 5 6 8 10];
 % sumlink_mbps_kmeans_arr = zeros(length(N_vals), 1);
 % sumlink_mbps_grid_arr = zeros(length(N_vals), 1);

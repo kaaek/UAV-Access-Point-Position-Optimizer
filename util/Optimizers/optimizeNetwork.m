@@ -1,4 +1,4 @@
-function [uav_pos_opt, Bandwidth_opt, Rate_opt] = optimizeNetwork(M, N, INITIAL_UAV_POS, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin)
+function [uav_pos_opt, Bandwidth_opt, Rate_opt, sumrate_mbps] = optimizeNetwork(M, N, INITIAL_UAV_POS, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin)
 SIDE = ceil(sqrt(AREA));
 
 % Solver setup
@@ -42,4 +42,5 @@ gs = GlobalSearch('Display','iter','MaxTime',600);
 uav_pos_opt     = reshape(x_opt(1:2*N),2,N)*SIDE;
 Bandwidth_opt   = x_opt(2*N+1:end) * BW_total;
 Rate_opt        = rate_fn(x_opt, N, SIDE, BW_total, user_pos, H_M, H, F, P_T, P_N);
+sumrate_mbps    = sum(Rate_opt)/1e6;
 end

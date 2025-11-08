@@ -1,4 +1,4 @@
-function [uav_pos_hier, baseline_br, sumlink_mbps] = hierarchicalUAV(user_pos, N, H_M, H, F, P_T)
+function [uav_pos_hier, baseline_br, sumrate_mbps] = hierarchicalUAV(user_pos, N, H_M, H, F, P_T, P_N, BW)
 M = size(user_pos, 2); % user_pos is 2xM
 % Compute pairwise distances (Euclidean)
 distMat = pdist(user_pos');  % Mx2 -> MxM distances
@@ -17,5 +17,5 @@ p_r             = p_received(user_pos, uav_pos_hier, H_M, H, F, P_T);
 a               = association(p_r);
 baseline_br     = sum(bitrate(p_r, P_N, (BW/M), a),2); % bps
 sumlink         = sum(baseline_br);
-sumlink_mbps    = sumlink/1e6;
+sumrate_mbps    = sumlink/1e6;
 end
