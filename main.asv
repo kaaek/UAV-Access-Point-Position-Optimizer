@@ -30,24 +30,13 @@ Rmin        = 0.2E6;    % Set minimum bit rate
 SIDE = sqrt(AREA);
 user_pos = SIDE * rand(2,M);
 
-[uav_pos_kmeans, baseline_br, ~] = kMeansUAV(user_pos, M, N, AREA, H_M, H, F, P_T, P_N, MAX_ITER, TOL, BW_total);
-plotNetwork(user_pos, uav_pos_kmeans, baseline_br, H_M, H, F, P_T, 'Reference K-Means Clustering');
-% %
-[uav_pos_opt_kmeans, ~, Rate_opt_kmeans] = optimizeNetwork(M, N, uav_pos_kmeans, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
-plotNetwork(user_pos, uav_pos_opt_kmeans, Rate_opt_kmeans, H_M, H, F, P_T, 'K means');
-% %
-[uav_pos_hier, baseline_br, ~] = hierarchicalUAV(user_pos, N);
-plotNetwork(user_pos, uav_pos_hier, baseline_br, H_M, H, F, P_T, 'Reference Hierarchy Clustering');
-% %
-[uav_pos_opt_hier, ~, Rate_opt_hier] = optimizeNetwork(M, N, uav_pos_hier, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
-plotNetwork(user_pos, uav_pos_opt_hier, Rate_opt_hier, H_M, H, F, P_T, 'Hierarchy');
-
-
-% uav_pos         = kMeans(user_pos, N, AREA, MAX_ITER, TOL);             % meters
-% p_r             = p_received(user_pos, uav_pos, H_M, H, F, P_T);        % dBm
-% a               = association(p_r);
-% baseline_br     = bitrate(p_r, P_N, (BW/M), a);                         % bps
-% sumlink         = sum(baseline_br);
+% % [uav_pos_kmeans, ~, ~] = kMeansSolution(user_pos, M, N, AREA, H_M, H, F, P_T, P_N, MAX_ITER, TOL, BW_total);
+% uav_pos_kmeans = kMeans(user_pos, N, AREA, MAX_ITER, TOL);
+% [uav_pos_opt, Bandwidth_opt, Rate_opt] = optimizeNetwork(M, N, uav_pos_kmeans, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
+% plotNetwork(user_pos, uav_pos_opt, Rate_opt, H_M, H, F, P_T, 'Network Visualization');
+uav_pos_hier = hierarchicalUAV(user_pos, N);
+[uav_pos_opt, Bandwidth_opt, Rate_opt] = optimizeNetwork(M, N, uav_pos_hier, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
+plotNetwork(user_pos, uav_pos_opt, Rate_opt, H_M, H, F, P_T, 'HierarchyVisualization');
 
 % % 1. N sweep
 % N_vals = [2 3 4 5 6 8 10];

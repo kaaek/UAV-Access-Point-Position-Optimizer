@@ -1,6 +1,6 @@
 %%
 % author: Khalil El Kaaki & Joe Abi Samra
-%
+% 25/10/2025
 %%
 
 function [c, ceq] = qosConstraint(br, Rmin)

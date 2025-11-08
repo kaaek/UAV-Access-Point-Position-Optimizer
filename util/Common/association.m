@@ -2,7 +2,7 @@
 % author: Khalil El Kaaki & Joe Abi Samra
 % 23/10/2025
 %%
-function a = assoc(p_r)
+function a = association(p_r)
 % ASSOC - Associates each row of a matrix with the index of its maximum value.
 %
 % Syntax: 
