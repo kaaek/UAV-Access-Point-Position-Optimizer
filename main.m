@@ -13,6 +13,8 @@ addpath("util\Optimizers\Helpers");
 addpath("util\Clustering\kMeans");
 addpath("util\Clustering\Hierarchical");
 
+% TO-DO: add DATA and computational constants to constants.m
+
 [M, N, AREA, H, H_M, F, K, GAMMA, D_0, P_T, P_N, MAX_ITER, TOL, BW_total, R_MIN, SIDE, TRIALS] = constants();
 
 N_vals      = [1 2 6 10 14 18 24 30];
