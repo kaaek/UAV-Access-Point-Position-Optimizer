@@ -50,11 +50,11 @@ for i = 1:M         % For every User
                             (y_m(i) - y_n(j))^2 ...
                             + H^2);         % Euclidian distance
         d(i, j) = dist;
-        % L = - K + 10*GAMMA*log10(d(i, j)/D_0);
+        % Using the empirical Okumura-Hata:
         C_h = 0.8 + (1.1 * log10(F)-0.7) * H_M - 1.56 * log10(F);
         L_u = 69.55 + 26.16 * log10(F) - 13.82 * log10(H) - C_h + (44.9 - 6.55 * log10(H)) * log10(dist);
         L = L_u - 4.78 * (log10(F))^2 + 18.33 * log10(F) - 40.94;
-        p_r(i,j) = P_T - L;                   % dBm
+        p_r(i,j) = P_T - L; % dBm
     end
 end
 end

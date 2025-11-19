@@ -13,19 +13,6 @@ addpath("util\Optimizers\Helpers");
 addpath("util\Clustering\kMeans");
 addpath("util\Clustering\Hierarchical");
 
-% user_pos = SIDE * rand(2,M);
-% [uav_pos_kmeans, baseline_br, sumlink] = kMeansUAV(user_pos, M, N, AREA, H_M, H, F, P_T, P_N, MAX_ITER, TOL, BW_total);
-% plotNetwork(user_pos, uav_pos_kmeans, baseline_br, H_M, H, F, P_T, 'Reference K-Means Clustering');
-% % % Optimized K means
-% [uav_pos_opt_kmeans, ~, Rate_opt_kmeans] = optimizeNetwork(M, N, uav_pos_kmeans, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
-% plotNetwork(user_pos, uav_pos_opt_kmeans, Rate_opt_kmeans, H_M, H, F, P_T, 'OPtimized K-Means Clustering');
-% % % 
-% [uav_pos_hier, baseline_br, ~] = hierarchicalUAV(user_pos, N);
-% plotNetwork(user_pos, uav_pos_hier, baseline_br, H_M, H, F, P_T, 'Reference Hierarchy Clustering');
-% % % Optimized Hierarchical
-% [uav_pos_opt_hier, ~, Rate_opt_hier] = optimizeNetwork(M, N, uav_pos_hier, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin);
-% plotNetwork(user_pos, uav_pos_opt_hier, Rate_opt_hier, H_M, H, F, P_T, 'Hierarchy');
-
 [M, N, AREA, H, H_M, F, K, GAMMA, D_0, P_T, P_N, MAX_ITER, TOL, BW_total, R_MIN, SIDE, TRIALS] = constants();
 
 N_vals      = [1 2 6 10 14 18 24 30];
