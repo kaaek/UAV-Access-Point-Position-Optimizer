@@ -6,14 +6,14 @@ function [bw_needed, feasible] = initBandwidth(user_pos, uav_pos, assoc, Rmin, B
     Pr = p_received(user_pos, uav_pos, H_M, H, F, P_T);
     SE = log2(1 + Pr ./ P_N);    % bits/s/Hz
 
-    bw_req = zeros(N,1);
+    bw_req = zeros(M,1);
     for k = 1:N
-        users_k = find(assoc(:,k) == 1);
+        users_k = find(assoc(:,k) == 1); % returns all users connected to UAV N.
         if isempty(users_k)
             continue
         end
-        for u = users_k'
-            bw_req(k) = bw_req(k) + Rmin / SE(u);
+        for u = 1:numel(users_k)
+            bw_req(u) = Rmin / SE(u);
         end
     end
 
