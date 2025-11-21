@@ -1,4 +1,4 @@
-function plotSweep (x, sumrate_kmeans_ref_arr, sumrate_kmeans_opt_arr, sumrate_hier_ref_arr, sumrate_hier_opt_arr, xlabelText, figTitle)
+function plot_sweep (x, sumrate_kmeans_ref_arr, sumrate_kmeans_opt_arr, sumrate_hier_ref_arr, sumrate_hier_opt_arr, xlabelText, figTitle)
 figure;
 hold on;
 plot(x, sumrate_kmeans_ref_arr, '-o', 'DisplayName', 'K-Means Reference');

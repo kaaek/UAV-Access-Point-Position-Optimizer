@@ -33,28 +33,18 @@ if size(uav_pos,1) ~= 2
     error('uav_pos must be 2xN.');
 end
 
-M = size(user_pos, 2); % user_pos(1), user_pos(2) = x_m, y_m
-N = size(uav_pos, 2);
+% Vectorized computation: distances between all users and UAVs
+% reshape to enable broadcasting: (M,1) - (1,N)
+x_m = user_pos(1,:)'; % Column vector (Mx1)
+y_m = user_pos(2,:)'; % Column vector (Mx1)
+x_n = uav_pos(1,:);   % Row vector (1xN)
+y_n = uav_pos(2,:);   % Row vector (1xN)
 
-x_m = user_pos(1,:); % Vectors
-y_m = user_pos(2,:);
-x_n = uav_pos(1,:);
-y_n = uav_pos(2,:);
-p_r = zeros(M, N);
-d = zeros(M, N);
+d = sqrt((x_m - x_n).^2 + (y_m - y_n).^2 + H^2); % MxN matrix
 
-for i = 1:M         % For every User
-    for j = 1:N     % For every UAV
-        dist = sqrt( ...
-                            (x_m(i) - x_n(j))^2 + ...
-                            (y_m(i) - y_n(j))^2 ...
-                            + H^2);         % Euclidian distance
-        d(i, j) = dist;
-        % Using the empirical Okumura-Hata:
-        C_h = 0.8 + (1.1 * log10(F)-0.7) * H_M - 1.56 * log10(F);
-        L_u = 69.55 + 26.16 * log10(F) - 13.82 * log10(H) - C_h + (44.9 - 6.55 * log10(H)) * log10(dist);
-        L = L_u - 4.78 * (log10(F))^2 + 18.33 * log10(F) - 40.94;
-        p_r(i,j) = P_T - L; % dBm
-    end
-end
+% Vectorized path loss calculation (Okumura-Hata)
+C_h = 0.8 + (1.1 * log10(F) - 0.7) * H_M - 1.56 * log10(F);
+L_u = 69.55 + 26.16 * log10(F) - 13.82 * log10(H) - C_h + (44.9 - 6.55 * log10(H)) * log10(d);
+L = L_u - 4.78 * (log10(F))^2 + 18.33 * log10(F) - 40.94;
+p_r = P_T - L; % MxN matrix in dBm
 end

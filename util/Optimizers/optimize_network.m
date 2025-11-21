@@ -1,11 +1,11 @@
-function [uav_pos_opt, Bandwidth_opt, Rate_opt, sumrate_mbps] = optimizeNetwork(M, N, INITIAL_UAV_POS, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin)
+function [uav_pos_opt, Bandwidth_opt, Rate_opt, sumrate_mbps] = optimize_network(M, N, INITIAL_UAV_POS, BW_total, AREA, user_pos, H_M, H, F, P_T, P_N, Rmin)
 SIDE = ceil(sqrt(AREA));
 
 % Decision Vector
 UAV_POS_FLAT_norm = reshape(INITIAL_UAV_POS / SIDE, [], 1);  % divide by SIDE to normalize, column vector
 
 p_r = p_received(user_pos, INITIAL_UAV_POS, H_M, H, F, P_T);
-bw_req_user = initBandwidth(user_pos, INITIAL_UAV_POS, association(p_r), Rmin, BW_total, H_M, H, F, P_T, P_N);
+bw_req_user = init_bandwidth(user_pos, INITIAL_UAV_POS, association(p_r), Rmin, BW_total, H_M, H, F, P_T, P_N);
 bw_req_user(~isfinite(bw_req_user) | bw_req_user < 0) = 0;
 if sum(bw_req_user) == 0
     bw_req_user = ones(M,1) * (BW_total / M);   % fallback uniform

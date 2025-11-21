@@ -1,4 +1,4 @@
-function [uav_pos_hier, baseline_br, sumrate_mbps] = hierarchicalUAV(user_pos, N, H_M, H, F, P_T, P_N, BW)
+function [uav_pos_hier, baseline_br, sumrate_mbps] = hierarchical_uav(user_pos, N, H_M, H, F, P_T, P_N, BW)
 M = size(user_pos, 2); % user_pos is 2xM
 % Compute pairwise distances (Euclidean)
 distMat = pdist(user_pos');  % Mx2 -> MxM distances

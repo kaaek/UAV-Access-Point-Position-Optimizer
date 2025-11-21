@@ -2,7 +2,7 @@
 % author: Khalil El Kaaki & Joe Abi Samra
 % 23/10/2025
 %%
-function uav_pos = kMeans(user_pos, N, AREA, MAX_ITER, TOL)
+function uav_pos = k_means(user_pos, N, AREA, MAX_ITER, TOL)
 % kMeans - Places UAVs based on user positions using k-means clustering
 %
 % Inputs:
@@ -15,8 +15,8 @@ function uav_pos = kMeans(user_pos, N, AREA, MAX_ITER, TOL)
 % Outputs:
 %   uav_pos - 2xN matrix of UAV positions
 
-[M_dim, M] = size(user_pos);
-if M_dim ~= 2
+M = size(user_pos, 2);
+if size(user_pos, 1) ~= 2
     error('user_pos must have dimension 2xM.');
 end
 
@@ -25,16 +25,14 @@ side = sqrt(AREA);
 centroids = side * rand(2, N);
 
 for iter = 1:MAX_ITER
-    prev_centroids = centroids; % Initialize centroids randomly
+    prev_centroids = centroids;
     
-    distance = zeros(M, N);
-    for n = 1:N     % For each UAV
-        distance(:, n) = sqrt((user_pos(1, :) - centroids(1, n)).^2 + ... % Compute the distance to all users
-                              (user_pos(2, :) - centroids(2, n)).^2);
-    end
+    % Vectorized distance computation: (Mx1) - (1xN) broadcasts to MxN
+    dx = user_pos(1, :)' - centroids(1, :);  % Mx1 - 1xN = MxN
+    dy = user_pos(2, :)' - centroids(2, :);  % Mx1 - 1xN = MxN
+    distance = sqrt(dx.^2 + dy.^2);          % MxN
     
-    
-    [~, assoc] = min(distance, [], 2); % association matrix: Mx1. Assign each user to the closest UAV
+    [~, assoc] = min(distance, [], 2);       % Mx1: assign each user to closest UAV
     
     % Update centroids based on new association
     for n = 1:N

@@ -22,8 +22,6 @@ function a = association(p_r)
 
 [M, N] = size(p_r);
 a = zeros(M, N);
-for i = 1:M
-    [~, index_max] = max(p_r(i, :));  % Returns the index of the max
-    a(i, index_max) = 1;              % Switches the corresponding association value to 1
-end
+[~, index_max] = max(p_r, [], 2);  % Returns Mx1 indices of max values along columns
+a(sub2ind(size(a), (1:M)', index_max)) = 1;  % Vectorized assignment
 end

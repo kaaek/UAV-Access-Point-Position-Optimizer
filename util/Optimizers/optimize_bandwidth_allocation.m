@@ -3,7 +3,7 @@
 % 25/10/2025
 %%
 
-function [B_opt, br_opt, sum_br_opt_mbps] = optimizeBandwidthAllocation(M, BW_total, user_pos, opt_uav_pos, H_M, H, F, P_T, P_N, Rmin)
+function [B_opt, br_opt, sum_br_opt_mbps] = optimize_bandwidth_allocation(M, BW_total, user_pos, opt_uav_pos, H_M, H, F, P_T, P_N, Rmin)
 %OPTIMIZEBANDWIDTHALLOCATION Optimize bandwidth allocation for users
 %   [B_OPT, BR_OPT] = OPTIMIZEBANDWIDTHALLOCATION(M, BW_TOTAL, USER_POS, 
 %   OPT_UAV_POS, H, K, GAMMA, D_0, P_T, P_N, RMIN) optimally allocates 

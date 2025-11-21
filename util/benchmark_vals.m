@@ -1,4 +1,4 @@
-function [N_vals, M_vals, BW_vals, P_t_vals, Rmin_vals, Area_vals] = benchmarkVals()
+function [N_vals, M_vals, BW_vals, P_t_vals, Rmin_vals, Area_vals] = benchmark_vals()
 N_vals      = [1 2 6 10 14 18 24 30];
 M_vals      = [20 50 100 200 500 700];
 BW_vals     = [20e6, 40e6, 80e6, 160e6];

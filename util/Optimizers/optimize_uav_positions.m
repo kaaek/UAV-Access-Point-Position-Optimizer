@@ -3,7 +3,7 @@
 % 25/10/2025
 %%
 
-function uav_pos_opt = optimizeUAVPositions(N, AREA, uav_pos, user_pos, H_M, H, F, P_T, P_N, BW, Rmin)
+function uav_pos_opt = optimize_uav_positions(N, AREA, uav_pos, user_pos, H_M, H, F, P_T, P_N, BW, Rmin)
 % This function optimizes the positions of UAVs to maximize the proportional fairness of the bitrate received by users.
 %
 % Inputs:

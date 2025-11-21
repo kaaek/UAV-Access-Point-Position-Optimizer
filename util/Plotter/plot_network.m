@@ -1,4 +1,4 @@
-function plotNetwork(user_pos, uav_pos, H_M, H, F, P_T, figTitle)
+function plot_network(user_pos, uav_pos, H_M, H, F, P_T, figTitle)
 % Plot UAVs vs Users
 figure; 
 sgtitle(figTitle);
